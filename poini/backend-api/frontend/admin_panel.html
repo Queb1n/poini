@@ -55,6 +55,11 @@
   </div>
 
   <script>
+    // Cambia esta URL por la de tu backend en producción
+    const API_BASE_URL = window.location.hostname === "localhost"
+      ? "http://localhost:3000"
+      : "https://poini-production.up.railway.app";
+
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!usuario || usuario.rol !== "admin") {
       location.href = "login.html";
@@ -118,10 +123,10 @@
         }
       }
 
-      console.log("🔄 Enviando:", nuevoUsuario); // ✅ Útil para debug
+      console.log("🔄 Enviando:", nuevoUsuario); // Para debug
 
       try {
-        const res = await fetch("http://localhost:3000/api/usuarios", {
+        const res = await fetch(`${API_BASE_URL}/api/usuarios`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(nuevoUsuario)
