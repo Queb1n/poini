@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const db = require('./conexion');
-require("dotenv").config(); // <--- Asegúrate de cargar las variables del .env
+require("dotenv").config();
 
 const app = express();
 app.use(cors());
@@ -12,7 +12,12 @@ app.get('/', (req, res) => {
   res.redirect('/api/login');
 });
 
-// 🔐 Login
+// Ruta GET para /api/login (solo para probar en navegador)
+app.get('/api/login', (req, res) => {
+  res.send('Página de login (usa POST para autenticar)');
+});
+
+// 🔐 Login (POST)
 app.post("/api/login", (req, res) => {
   const { matricula, password, rol } = req.body;
 
