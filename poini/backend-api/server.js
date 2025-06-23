@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const db = require('./conexion');
+require("dotenv").config(); // <--- Asegúrate de cargar las variables del .env
 
 const app = express();
 app.use(cors());
@@ -18,7 +19,6 @@ app.post("/api/login", (req, res) => {
     }
     if (results.length > 0) {
       const usuario = results[0];
-      // Obtener materias del usuario
       const queryMaterias = "SELECT clave_materia FROM usuarios_materias WHERE id_usuario = ?";
       db.query(queryMaterias, [usuario.id_usuario], (err2, materiasResult) => {
         if (err2) return res.status(500).json({ error: "Error al obtener materias" });
@@ -68,7 +68,6 @@ app.post("/api/usuarios", (req, res) => {
 
     const id_usuario = result.insertId;
 
-    // Insertar materias si existen
     if (materias.length > 0) {
       const values = materias.map(m => [id_usuario, m]);
       db.query("INSERT INTO usuarios_materias (id_usuario, clave_materia) VALUES ?", [values], err2 => {
@@ -101,6 +100,6 @@ app.delete("/api/usuarios/:matricula", (req, res) => {
   });
 });
 
-// 🟢 Iniciar servidor
-const PORT = 3000;
+// 🟢 Iniciar servidor en el puerto del .env o por defecto en 3000
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ API funcionando en http://localhost:${PORT}`));
