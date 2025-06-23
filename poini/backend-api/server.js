@@ -8,12 +8,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Servir archivos estáticos desde la carpeta 'frontend'
-app.use(express.static(path.join(__dirname, "frontend")));
+// 👉 Servir archivos estáticos desde la carpeta frontend
+app.use(express.static(path.join(__dirname, 'frontend')));
 
-// Ruta raíz que envía el archivo login.html
+// 👉 Ruta raíz que muestra login.html
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "login.html"));
+  res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
 });
 
 // 🔐 Login
@@ -109,6 +109,6 @@ app.delete("/api/usuarios/:matricula", (req, res) => {
   });
 });
 
-// 🟢 Iniciar servidor en el puerto del .env o por defecto en 3000
+// 🟢 Iniciar servidor
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ API funcionando en http://localhost:${PORT}`));
+app.listen(PORT, () => console.log(`✅ API y frontend funcionando en http://localhost:${PORT}`));
