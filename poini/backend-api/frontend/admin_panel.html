@@ -33,6 +33,7 @@
         <option value="">Selecciona rol</option>
         <option value="alumno">Alumno</option>
         <option value="profesor">Profesor</option>
+        <option value="admin">Administrador</option> <!-- Agregado admin -->
       </select>
       <input type="text" placeholder="Nombre" name="nombre" required />
       <input type="text" placeholder="Apellido Paterno" name="ape1" />
@@ -43,7 +44,7 @@
       <div style="flex: 1 1 100%; margin-top: 10px;">
         <label><strong>Selecciona materias:</strong></label>
         <div id="materiasCheckboxes" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
-          <!-- Checkboxes se llenan con JS -->
+          <!-- Checkboxes generados con JS -->
         </div>
       </div>
 
@@ -55,11 +56,7 @@
   </div>
 
   <script>
-    // Cambia esta URL por la de tu backend en producción
-    const API_BASE_URL = window.location.hostname === "localhost"
-      ? "http://localhost:3000"
-      : "https://poini-production.up.railway.app";
-
+    // Validar sesión y mostrar nombre
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!usuario || usuario.rol !== "admin") {
       location.href = "login.html";
@@ -77,6 +74,7 @@
       alert("Excel general del sistema generado (simulado)");
     }
 
+    // Materias disponibles
     const materiasDisponibles = [
       "ACF-0905",
       "SCC-1017",
@@ -89,6 +87,7 @@
       "ACA-0907"
     ];
 
+    // Generar checkboxes materias
     const materiasContainer = document.getElementById("materiasCheckboxes");
     materiasDisponibles.forEach(materia => {
       const label = document.createElement("label");
@@ -100,33 +99,33 @@
       materiasContainer.appendChild(label);
     });
 
+    // Enviar formulario
     document.getElementById("formNuevoUsuario").addEventListener("submit", async function (e) {
       e.preventDefault();
       const form = new FormData(e.target);
+
+      // Convertir FormData a objeto
       const nuevoUsuario = Object.fromEntries(form.entries());
 
-      // Obtener materias seleccionadas
+      // Obtener materias seleccionadas como array
       const materiasSeleccionadas = Array.from(
         document.querySelectorAll('input[name="materias"]:checked')
       ).map(c => c.value);
 
       nuevoUsuario.materias = materiasSeleccionadas;
 
-      // Si no es alumno, eliminar grupo y materias
+      // Ajustes según rol
       if (nuevoUsuario.rol !== "alumno") {
-        delete nuevoUsuario.grupo;
+        nuevoUsuario.grupo = null;
         nuevoUsuario.materias = [];
       } else {
-        // Asegurar que grupo sea null si está vacío
-        if (!nuevoUsuario.grupo?.trim()) {
+        if (!nuevoUsuario.grupo || nuevoUsuario.grupo.trim() === "") {
           nuevoUsuario.grupo = null;
         }
       }
 
-      console.log("🔄 Enviando:", nuevoUsuario); // Para debug
-
       try {
-        const res = await fetch(`${API_BASE_URL}/api/usuarios`, {
+        const res = await fetch("http://localhost:3000/api/usuarios", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(nuevoUsuario)
@@ -138,7 +137,7 @@
           document.querySelectorAll('input[name="materias"]').forEach(c => c.checked = false);
         } else {
           const error = await res.json();
-          alert("❌ Error al registrar: " + (error?.error || "verifica los campos"));
+          alert("❌ Error al registrar: " + (error?.error || "Verifica los campos"));
         }
       } catch (err) {
         console.error("Error al conectar con el servidor:", err);

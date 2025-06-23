@@ -35,12 +35,10 @@ app.post("/api/login", (req, res) => {
       const queryMaterias = "SELECT clave_materia FROM usuarios_materias WHERE id_usuario = ?";
       db.query(queryMaterias, [usuario.id_usuario], (err2, materiasResult) => {
         if (err2) {
-          console.error("Error al obtener materias:", err2);
-          usuario.materias = []; // Evitar fallo, continuar sin materias
-        } else {
-          usuario.materias = materiasResult.map(m => m.clave_materia);
+          return res.status(500).json({ error: "Error al obtener materias" });
         }
 
+        usuario.materias = materiasResult.map(m => m.clave_materia);
         res.json(usuario);
       });
     } else {
@@ -77,13 +75,20 @@ app.post("/api/usuarios", (req, res) => {
 
     if (materias.length > 0) {
       const values = materias.map(m => [id_usuario, m]);
-      db.query("INSERT INTO usuarios_materias (id_usuario, clave_materia) VALUES ?", [values], err2 => {
-        if (err2) {
-          console.error("Error al insertar materias:", err2);
-          return res.status(500).json({ error: "Usuario creado pero error al guardar materias" });
+      const placeholders = values.map(() => "(?, ?)").join(", ");
+      const flatValues = values.flat();
+
+      db.query(
+        `INSERT INTO usuarios_materias (id_usuario, clave_materia) VALUES ${placeholders}`,
+        flatValues,
+        (err2) => {
+          if (err2) {
+            console.error("Error al insertar materias:", err2);
+            return res.status(500).json({ error: "Usuario creado pero error al guardar materias" });
+          }
+          res.status(201).json({ mensaje: "Usuario registrado con materias" });
         }
-        res.status(201).json({ mensaje: "Usuario registrado con materias" });
-      });
+      );
     } else {
       res.status(201).json({ mensaje: "Usuario registrado sin materias" });
     }
