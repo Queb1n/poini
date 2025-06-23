@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Tomar Pase</title>
+  <link rel="stylesheet" href="css/proflista.css">
+  <style>
+    #selectorDia {
+      margin-bottom: 15px;
+      padding: 8px 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 200px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Pase de Lista</h2>
+
+    <label for="selectorDia">Selecciona el día para pasar lista:</label><br>
+    <select id="selectorDia"></select>
+
+    <table border="1" style="width:100%; margin-top: 20px;">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Matrícula</th>
+          <th>Nombre</th>
+          <th>Apellido Paterno</th>
+          <th>Apellido Materno</th>
+          <th>Correo</th>
+          <th>Asistencia</th>
+        </tr>
+      </thead>
+      <tbody id="tablaPase"></tbody>
+    </table>
+    <br>
+    <button onclick="guardarPase()">Guardar Pase</button>
+    <button onclick="generarExcel()">Generar Excel</button>
+    <a href="profesor.html"><button>Volver</button></a>
+  </div>
+
+  <script>
+    const horarios = [
+      { clave: "SCC-1017", nombre: "Métodos Numéricos", dia: "Lunes" },
+      { clave: "ACF-0905", nombre: "Ecuaciones Diferenciales", dia: "Lunes" },
+      { clave: "TUTORIAS", nombre: "Tutorias", dia: "Lunes" },
+      { clave: "INGLES", nombre: "INGLES", dia: "Martes" },
+      { clave: "SCD-1003", nombre: "Arquitectura de Computadoras", dia: "Martes" },
+      { clave: "SCD-1027", nombre: "Tópicos Avanzados de Programación", dia: "Martes" },
+      { clave: "AEF-1031", nombre: "Fundamentos de Base de Datos", dia: "Martes" },
+      { clave: "SCC-1017", nombre: "Métodos Numéricos", dia: "Miércoles" },
+      { clave: "INGLES", nombre: "Ingles", dia: "Miércoles" },
+      { clave: "ACF-0905", nombre: "Ecuaciones Diferenciales", dia: "Miércoles" },
+      { clave: "SCA-1026", nombre: "Taller de Sistemas Operativos", dia: "Miércoles" },
+      { clave: "INGLES", nombre: "Ingles", dia: "Jueves" },
+      { clave: "ACA-0907", nombre: "Taller de Ética", dia: "Jueves" },
+      { clave: "AEF-1031", nombre: "Fundamentos de Base de Datos", dia: "Jueves" },
+      { clave: "SCD-1027", nombre: "Tópicos Avanzados de Programación", dia: "Jueves" },
+      { clave: "SCA-1026", nombre: "Taller de Sistemas Operativos", dia: "Viernes" },
+      { clave: "ACA-0907", nombre: "Taller de Ética", dia: "Viernes" },
+      { clave: "SCD-1003", nombre: "Arquitectura de Computadoras", dia: "Viernes" }
+    ];
+
+    function normalizarDia(dia) {
+      return dia.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    const materia = localStorage.getItem("materiaSeleccionada");
+    const selectorDia = document.getElementById("selectorDia");
+    const tbody = document.getElementById("tablaPase");
+
+    if (!usuario || usuario.rol !== "profesor" || !materia) {
+      location.href = "login.html";
+    }
+
+    let alumnos = [];
+
+    // 🔄 Cargar alumnos desde backend
+    fetch("http://localhost:3000/api/usuarios")
+      .then(res => res.json())
+      .then(data => {
+        alumnos = data.filter(u => u.rol === "alumno" && u.materias && u.materias.includes(materia));
+        inicializarDias();
+        renderizarTabla();
+      })
+      .catch(err => {
+        console.error("Error al cargar usuarios:", err);
+        alert("No se pudieron cargar los datos de los alumnos.");
+      });
+
+    function inicializarDias() {
+      const diasMateria = [...new Set(
+        horarios.filter(h => h.clave === materia).map(h => h.dia)
+      )];
+
+      const nombresDias = {
+        lunes: "Lunes",
+        martes: "Martes",
+        miercoles: "Miércoles",
+        jueves: "Jueves",
+        viernes: "Viernes",
+        sabado: "Sábado",
+        domingo: "Domingo"
+      };
+
+      selectorDia.innerHTML = "";
+
+      if (diasMateria.length === 0) {
+        selectorDia.innerHTML = `<option value="">No hay días asignados</option>`;
+        selectorDia.disabled = true;
+      } else {
+        diasMateria.forEach(dia => {
+          const val = normalizarDia(dia);
+          const option = document.createElement("option");
+          option.value = val;
+          option.textContent = nombresDias[val] || dia;
+          selectorDia.appendChild(option);
+        });
+        selectorDia.disabled = false;
+        selectorDia.value = normalizarDia(diasMateria[0]);
+      }
+
+      selectorDia.addEventListener("change", renderizarTabla);
+    }
+
+    function renderizarTabla() {
+      tbody.innerHTML = "";
+      const pases = JSON.parse(localStorage.getItem("pases") || "{}");
+      const diaSeleccionado = selectorDia.value;
+      const paseDia = (pases[materia] && pases[materia][diaSeleccionado]) || [];
+
+      alumnos.forEach(al => {
+        const registro = paseDia.find(p => p.id_usuario === al.id_usuario);
+        const estado = registro ? registro.estado : null;
+
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${al.id_usuario}</td>
+          <td>${al.matricula}</td>
+          <td>${al.nombre}</td>
+          <td>${al.ape1}</td>
+          <td>${al.ape2 || ""}</td>
+          <td>${al.correo}</td>
+          <td>
+            <div class="asistencia-buttons" data-id="${al.id_usuario}" data-estado="${estado || ''}">
+              <button class="btn-presente ${estado === 'Presente' ? 'active' : ''}" onclick="marcarAsistencia(${al.id_usuario}, 'Presente', this)">Asistencia</button>
+              <button class="btn-retardo ${estado === 'Retardo' ? 'active' : ''}" onclick="marcarAsistencia(${al.id_usuario}, 'Retardo', this)">Retardo</button>
+              <button class="btn-falta ${(!estado || estado === 'Falta') ? 'active' : ''}" onclick="marcarAsistencia(${al.id_usuario}, 'Falta', this)">Falta</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(fila);
+      });
+    }
+
+    function marcarAsistencia(id, tipo, boton) {
+      const grupoBotones = boton.parentElement;
+      grupoBotones.dataset.estado = tipo;
+
+      grupoBotones.querySelectorAll("button").forEach(btn => btn.classList.remove("active"));
+      boton.classList.add("active");
+    }
+
+    function guardarPase() {
+      const botones = document.querySelectorAll(".asistencia-buttons");
+      const diaSeleccionado = selectorDia.value;
+
+      let pases = JSON.parse(localStorage.getItem("pases") || "{}");
+      if (!pases[materia]) pases[materia] = {};
+
+      const paseActual = Array.from(botones).map(div => ({
+        id_usuario: parseInt(div.dataset.id),
+        estado: div.dataset.estado || "Falta"
+      }));
+
+      pases[materia][diaSeleccionado] = paseActual;
+
+      localStorage.setItem("pases", JSON.stringify(pases));
+
+      mostrarMensaje(`Pase guardado correctamente para ${materia} el día ${diaSeleccionado}.`);
+      renderizarTabla();
+    }
+
+    function mostrarMensaje(texto) {
+      let mensaje = document.getElementById("mensajeGuardar");
+      if (!mensaje) {
+        mensaje = document.createElement("div");
+        mensaje.id = "mensajeGuardar";
+        mensaje.style.position = "fixed";
+        mensaje.style.top = "20px";
+        mensaje.style.right = "20px";
+        mensaje.style.backgroundColor = "#27ae60";
+        mensaje.style.color = "white";
+        mensaje.style.padding = "10px 20px";
+        mensaje.style.borderRadius = "8px";
+        mensaje.style.boxShadow = "0 2px 10px rgba(0,0,0,0.2)";
+        mensaje.style.zIndex = "1000";
+        document.body.appendChild(mensaje);
+      }
+      mensaje.textContent = texto;
+      mensaje.style.opacity = "1";
+
+      setTimeout(() => {
+        mensaje.style.transition = "opacity 0.5s ease";
+        mensaje.style.opacity = "0";
+      }, 2500);
+    }
+
+    function generarExcel() {
+      alert("Excel generado (simulado) para materia: " + materia);
+    }
+  </script>
+</body>
+</html>

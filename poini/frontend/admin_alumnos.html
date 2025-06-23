@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gestión de Alumnos</title>
+  <link rel="stylesheet" href="css/admin_panel.css" />
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+
+    thead {
+      background-color: #2C3E50;
+      color: white;
+    }
+
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .btn-eliminar {
+      background-color: #e74c3c;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-eliminar:hover {
+      background-color: #c0392b;
+    }
+
+    .volver-btn {
+      margin-top: 20px;
+      display: inline-block;
+      background-color: #3498db;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+    }
+
+    .volver-btn:hover {
+      background-color: #2c3e50;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Alumnos Registrados</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Matrícula</th>
+          <th>Nombre</th>
+          <th>Correo</th>
+          <th>Grupo</th>
+          <th>Materias</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody id="tablaAlumnos"></tbody>
+    </table>
+
+    <a class="volver-btn" href="admin_panel.html">Volver al panel</a>
+  </div>
+
+  <script>
+    const tabla = document.getElementById("tablaAlumnos");
+
+    fetch("http://localhost:3000/api/usuarios")
+      .then(res => res.json())
+      .then(data => {
+        const alumnos = data.filter(u => u.rol === "alumno");
+
+        if (alumnos.length === 0) {
+          tabla.innerHTML = `<tr><td colspan="7">No hay alumnos registrados.</td></tr>`;
+        } else {
+          alumnos.forEach(al => {
+            const fila = document.createElement("tr");
+            fila.innerHTML = `
+              <td>${al.id_usuario}</td>
+              <td>${al.matricula}</td>
+              <td>${al.nombre} ${al.ape1 || ""} ${al.ape2 || ""}</td>
+              <td>${al.correo}</td>
+              <td>${al.grupo || "-"}</td>
+              <td>${(al.materias || []).join(", ")}</td>
+              <td><button class="btn-eliminar" onclick="eliminarAlumno('${al.matricula}')">Eliminar</button></td>
+            `;
+            tabla.appendChild(fila);
+          });
+        }
+      })
+      .catch(err => {
+        console.error("Error al cargar alumnos:", err);
+        tabla.innerHTML = `<tr><td colspan="7">Error al cargar alumnos.</td></tr>`;
+      });
+
+    function eliminarAlumno(matricula) {
+      if (!confirm(`¿Estás seguro de eliminar al alumno con matrícula ${matricula}?`)) return;
+
+      fetch(`http://localhost:3000/api/usuarios/${matricula}`, {
+        method: "DELETE"
+      })
+        .then(res => {
+          if (res.ok) {
+            alert("Alumno eliminado correctamente.");
+            location.reload();
+          } else {
+            return res.json().then(err => {
+              throw new Error(err.error || "No se pudo eliminar");
+            });
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          alert("Error al eliminar el alumno.");
+        });
+    }
+  </script>
+</body>
+</html>

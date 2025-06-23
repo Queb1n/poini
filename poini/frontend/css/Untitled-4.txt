@@ -1,0 +1,26 @@
+###PASO 4: Lector RFID (rfid_reader.py)
+
+
+
+
+from mfrc522 import SimpleMFRC522
+import requests
+
+reader = SimpleMFRC522()
+
+print("Esperando tarjeta...")
+
+try:
+    while True:
+        id, texto = reader.read()
+        print(f"Tarjeta detectada: {id}")
+
+        # Llamada al backend para marcar asistencia
+        response = requests.post("http://localhost:5000/asistencia", json={
+            "id_usuario": id,  # O puedes buscar el ID por RFID
+            "id_horario": 1    # Este valor debes decidirlo tú
+        })
+        print(response.json())
+
+except KeyboardInterrupt:
+    print("Lectura detenida")

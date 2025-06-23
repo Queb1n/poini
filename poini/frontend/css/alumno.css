@@ -1,0 +1,116 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #E4E9F2, #CFDEF3);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+}
+
+.login-container {
+    background-color: #FFFFFF;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    max-width: 900px;
+    width: 100%;
+}
+
+h2 {
+    color: #2C3E50;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#infoAlumno {
+    background-color: #ECF0F1;
+    padding: 15px;
+    border-radius: 10px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: #34495E;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 25px;
+    font-size: 14px;
+}
+
+thead {
+    background-color: #2C3E50;
+    color: white;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #DDD;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #F2F2F2;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #3498DB;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #2980B9;
+}
+
+/* ESTADOS DE ASISTENCIA */
+
+.estado-asistencia.presente {
+    color: #27AE60; /* Verde */
+}
+
+.estado-asistencia.falta {
+    color: #E74C3C; /* Rojo */
+}
+
+.estado-asistencia.retardo {
+    color: #F39C12; /* Naranja */
+}
+
+.estado-asistencia.no-registrado {
+    color: #7F8C8D; /* Gris */
+}
+
+/* ICONOS (Opcionales, puedes quitar si no te gustan) */
+
+.estado-asistencia.presente::before {
+    content: "✔ ";
+}
+
+.estado-asistencia.falta::before {
+    content: "✖ ";
+}
+
+.estado-asistencia.retardo::before {
+    content: "⏰ ";
+}
+
+.estado-asistencia.no-registrado::before {
+    content: "– ";
+}

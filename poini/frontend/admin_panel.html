@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panel Administrador</title>
+  <link rel="stylesheet" href="css/admin_panel.css" />
+</head>
+<body>
+  <div class="login-container">
+    <h1>Bienvenido, <span id="nombreAdmin"></span></h1>
+
+    <label for="grupoSelect"><strong>Seleccionar grupo:</strong></label>
+    <select id="grupoSelect">
+      <option value="3402">3402</option>
+    </select>
+
+    <h3>Opciones del sistema:</h3>
+    <div class="opciones">
+      <a href="#" onclick="redirigir('admin_alumnos.html')">👥 Gestionar alumnos</a>
+      <a href="#" onclick="redirigir('horario.html')">📆 Ver horario completo</a>
+      <a href="#" onclick="redirigir('ver_pase_general.html')">✅ Ver pase de lista general</a>
+    </div>
+
+    <button class="btn-excel" onclick="generarExcel()">🧾 Generar Excel general</button>
+
+    <hr style="margin: 30px 0;">
+
+    <h3>Registrar nuevo usuario</h3>
+    <form id="formNuevoUsuario">
+      <input type="text" placeholder="Matrícula" name="matricula" required />
+      <input type="password" placeholder="Contraseña" name="password" required />
+      <select name="rol" id="rolSelect" required>
+        <option value="">Selecciona rol</option>
+        <option value="alumno">Alumno</option>
+        <option value="profesor">Profesor</option>
+      </select>
+      <input type="text" placeholder="Nombre" name="nombre" required />
+      <input type="text" placeholder="Apellido Paterno" name="ape1" />
+      <input type="text" placeholder="Apellido Materno" name="ape2" />
+      <input type="email" placeholder="Correo" name="correo" required />
+      <input type="text" placeholder="Grupo (solo alumnos)" name="grupo" />
+
+      <div style="flex: 1 1 100%; margin-top: 10px;">
+        <label><strong>Selecciona materias:</strong></label>
+        <div id="materiasCheckboxes" style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
+          <!-- Checkboxes se llenan con JS -->
+        </div>
+      </div>
+
+      <button type="submit">Registrar</button>
+    </form>
+
+    <br />
+    <a href="login.html">Cerrar sesión</a>
+  </div>
+
+  <script>
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (!usuario || usuario.rol !== "admin") {
+      location.href = "login.html";
+    } else {
+      document.getElementById("nombreAdmin").textContent = usuario.nombre;
+    }
+
+    function redirigir(pagina) {
+      const grupo = document.getElementById("grupoSelect").value;
+      localStorage.setItem("grupoSeleccionado", grupo);
+      location.href = pagina;
+    }
+
+    function generarExcel() {
+      alert("Excel general del sistema generado (simulado)");
+    }
+
+    const materiasDisponibles = [
+      "ACF-0905",
+      "SCC-1017",
+      "TUTORIAS",
+      "INGLES",
+      "SCD-1003",
+      "SCD-1027",
+      "AEF-1031",
+      "SCA-1026",
+      "ACA-0907"
+    ];
+
+    const materiasContainer = document.getElementById("materiasCheckboxes");
+    materiasDisponibles.forEach(materia => {
+      const label = document.createElement("label");
+      label.style.flex = "1 1 30%";
+      label.innerHTML = `
+        <input type="checkbox" name="materias" value="${materia}" />
+        ${materia}
+      `;
+      materiasContainer.appendChild(label);
+    });
+
+    document.getElementById("formNuevoUsuario").addEventListener("submit", async function (e) {
+      e.preventDefault();
+      const form = new FormData(e.target);
+      const nuevoUsuario = Object.fromEntries(form.entries());
+
+      // Obtener materias seleccionadas
+      const materiasSeleccionadas = Array.from(
+        document.querySelectorAll('input[name="materias"]:checked')
+      ).map(c => c.value);
+
+      nuevoUsuario.materias = materiasSeleccionadas;
+
+      // Si no es alumno, eliminar grupo y materias
+      if (nuevoUsuario.rol !== "alumno") {
+        delete nuevoUsuario.grupo;
+        nuevoUsuario.materias = [];
+      } else {
+        // Asegurar que grupo sea null si está vacío
+        if (!nuevoUsuario.grupo?.trim()) {
+          nuevoUsuario.grupo = null;
+        }
+      }
+
+      console.log("🔄 Enviando:", nuevoUsuario); // ✅ Útil para debug
+
+      try {
+        const res = await fetch("http://localhost:3000/api/usuarios", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(nuevoUsuario)
+        });
+
+        if (res.ok) {
+          alert("✅ Usuario registrado correctamente");
+          e.target.reset();
+          document.querySelectorAll('input[name="materias"]').forEach(c => c.checked = false);
+        } else {
+          const error = await res.json();
+          alert("❌ Error al registrar: " + (error?.error || "verifica los campos"));
+        }
+      } catch (err) {
+        console.error("Error al conectar con el servidor:", err);
+        alert("❌ No se pudo conectar con el servidor");
+      }
+    });
+  </script>
+</body>
+</html>

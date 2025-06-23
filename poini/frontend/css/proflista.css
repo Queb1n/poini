@@ -1,0 +1,150 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(to right, #f7971e, #ffd200);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+}
+
+.login-container {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  max-width: 1000px;
+  width: 100%;
+}
+
+h2 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+thead {
+  background-color: #34495e;
+  color: white;
+}
+
+th, td {
+  padding: 12px;
+  border: 1px solid #ccc;
+  text-align: center;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f4f4f4;
+}
+
+.asistencia-buttons {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+
+.asistencia-buttons button {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 0;
+}
+
+.btn-presente {
+  background-color: #27ae60;
+  color: white;
+}
+
+.btn-presente:hover,
+.btn-presente.active {
+  background-color: #1e8449;
+}
+
+.btn-retardo {
+  background-color: #f39c12;
+  color: white;
+}
+
+.btn-retardo:hover,
+.btn-retardo.active {
+  background-color: #d35400;
+}
+
+.btn-falta {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-falta:hover,
+.btn-falta.active {
+  background-color: #c0392b;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin: 10px 5px;
+}
+
+button:hover {
+  background-color: #1e8449;
+}
+
+a button {
+  background-color: #3498db;
+}
+
+a button:hover {
+  background-color: #21618c;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* Contenedor para selector de día */
+.selector-dia-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+/* Selector de día actualizado */
+#selectorDia {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+  width: 200px;
+}
+
+#selectorDia:hover,
+#selectorDia:focus {
+  border-color: #27ae60;
+}

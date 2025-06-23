@@ -1,0 +1,139 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #e0eafc, #cfdef3);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 20px;
+}
+
+.login-container {
+    background-color: #ffffff;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    max-width: 1000px;
+    width: 100%;
+}
+
+h2 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin-top: 20px;
+}
+
+thead {
+    background-color: #2980b9;
+    color: white;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #ccc;
+    text-align: center;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f8f9f9;
+}
+
+.estado-asistencia {
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+/* Colores para estados de asistencia */
+.estado-asistencia.presente {
+    color: #27ae60; /* verde */
+}
+
+.estado-asistencia.retardo {
+    color: #f39c12; /* naranja */
+}
+
+.estado-asistencia.falta {
+    color: #e74c3c; /* rojo */
+}
+
+.estado-asistencia:not(.presente):not(.retardo):not(.falta) {
+    color: #7f8c8d; /* gris para estados no definidos */
+}
+
+/* Botones generales */
+button {
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 10px 5px;
+}
+
+button:hover {
+    background-color: #21618c;
+}
+
+a {
+    text-decoration: none;
+}
+
+/* Estilos específicos para los botones de asistencia (en profesor_lista) */
+.asistencia-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.asistencia-buttons button {
+    flex: 1;
+    padding: 6px 8px;
+    font-size: 13px;
+    border-radius: 5px;
+    border: 1px solid transparent;
+    background-color: #bdc3c7;
+    color: #2c3e50;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    user-select: none;
+}
+
+.asistencia-buttons button.active {
+    color: white;
+    font-weight: 600;
+}
+
+.asistencia-buttons button.btn-presente.active {
+    background-color: #27ae60; /* verde */
+    border-color: #1e8449;
+}
+
+.asistencia-buttons button.btn-retardo.active {
+    background-color: #f39c12; /* naranja */
+    border-color: #d68910;
+}
+
+.asistencia-buttons button.btn-falta.active {
+    background-color: #e74c3c; /* rojo */
+    border-color: #c0392b;
+}
+
+.asistencia-buttons button:hover:not(.active) {
+    background-color: #95a5a6;
+    color: white;
+}

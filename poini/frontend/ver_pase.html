@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pase de Lista - Guardado</title>
+  <link rel="stylesheet" href="css/verpase.css">
+</head>
+<body>
+  <div class="login-container">
+    <h2>Pase de Lista Guardado</h2>
+
+    <!-- Selector de día agregado -->
+    <label for="selectorDia">Selecciona el día para ver la asistencia:</label><br>
+    <select id="selectorDia" style="margin-bottom: 20px; padding: 8px 12px; font-size: 16px; border-radius: 6px; border: 1px solid #ccc; width: 200px;"></select>
+
+    <table id="tablaPase" border="1" style="width:100%; margin-top: 20px;">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Matrícula</th>
+          <th>Nombre</th>
+          <th>Apellido Paterno</th>
+          <th>Apellido Materno</th>
+          <th>Correo</th>
+          <th>Asistencia</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <br>
+    <button onclick="generarExcel()">Generar Excel</button>
+    <br><br>
+    <button onclick="volver()">Volver</button>
+  </div>
+
+  <script src="js/datosSimulados.js"></script>
+  <script>
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    if (!usuario) location.href = "login.html";
+
+    const pase = JSON.parse(localStorage.getItem("pases") || "{}");
+    const materia = localStorage.getItem("materiaSeleccionada");
+    const alumnos = usuariosSimulados.filter(u => u.rol === "alumno");
+    const tabla = document.querySelector("#tablaPase tbody");
+    const selectorDia = document.getElementById("selectorDia");
+
+    // Días posibles según horarios de la materia (copiado de profesor_lista.js)
+    const horarios = [
+      { clave: "SCC-1017", dia: "Lunes" },
+      { clave: "ACF-0905", dia: "Lunes" },
+      { clave: "TUTORIAS", dia: "Lunes" },
+      { clave: "INGLES", dia: "Martes" },
+      { clave: "SCD-1003", dia: "Martes" },
+      { clave: "SCD-1027", dia: "Martes" },
+      { clave: "AEF-1031", dia: "Martes" },
+      { clave: "SCC-1017", dia: "Miércoles" },
+      { clave: "INGLES", dia: "Miércoles" },
+      { clave: "ACF-0905", dia: "Miércoles" },
+      { clave: "SCA-1026", dia: "Miércoles" },
+      { clave: "INGLES", dia: "Jueves" },
+      { clave: "ACA-0907", dia: "Jueves" },
+      { clave: "AEF-1031", dia: "Jueves" },
+      { clave: "SCD-1027", dia: "Jueves" },
+      { clave: "SCA-1026", dia: "Viernes" },
+      { clave: "ACA-0907", dia: "Viernes" },
+      { clave: "SCD-1003", dia: "Viernes" }
+    ];
+
+    // Normaliza día (sin acentos y minúscula) para value del select
+    function normalizarDia(dia) {
+      return dia.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+
+    // Obtener días únicos de la materia seleccionada
+    const diasMateria = [...new Set(
+      horarios.filter(h => h.clave === materia).map(h => h.dia)
+    )];
+
+    // Map para mostrar el nombre con mayúscula y acento si aplica
+    const nombresDias = {
+      lunes: "Lunes",
+      martes: "Martes",
+      miercoles: "Miércoles",
+      jueves: "Jueves",
+      viernes: "Viernes",
+      sabado: "Sábado",
+      domingo: "Domingo"
+    };
+
+    // Cargar select con días válidos
+    function cargarSelectorDias() {
+      selectorDia.innerHTML = "";
+      if (diasMateria.length === 0) {
+        selectorDia.innerHTML = `<option value="">No hay días asignados</option>`;
+        selectorDia.disabled = true;
+      } else {
+        diasMateria.forEach(dia => {
+          const val = normalizarDia(dia);
+          const opt = document.createElement("option");
+          opt.value = val;
+          opt.textContent = nombresDias[val] || dia;
+          selectorDia.appendChild(opt);
+        });
+        selectorDia.disabled = false;
+      }
+    }
+
+    // Función para renderizar tabla según día seleccionado
+    function renderizarTabla() {
+      tabla.innerHTML = "";
+      const diaSeleccionado = selectorDia.value;
+      if (!diaSeleccionado) {
+        tabla.innerHTML = "<tr><td colspan='7'>Seleccione un día para mostrar la asistencia</td></tr>";
+        return;
+      }
+
+      // Pase guardado para materia y día
+      const paseMateria = pase[materia] || {};
+      const paseDia = paseMateria[diaSeleccionado] || [];
+
+      alumnos.forEach(al => {
+        const registro = paseDia.find(p => p.id_usuario === al.id_usuario);
+        const estado = registro ? registro.estado : "No registrado";
+        const claseEstado = estado.toLowerCase().replace(" ", "-");
+
+        const fila = document.createElement("tr");
+        fila.innerHTML = `
+          <td>${al.id_usuario}</td>
+          <td>${al.matricula}</td>
+          <td>${al.nombre}</td>
+          <td>${al.ape1}</td>
+          <td>${al.ape2 || ""}</td>
+          <td>${al.correo}</td>
+          <td class="estado-asistencia ${claseEstado}">${estado}</td>
+        `;
+        tabla.appendChild(fila);
+      });
+    }
+
+    function generarExcel() {
+      if (usuario.rol === "admin") {
+        alert("Excel general de todo el sistema generado (simulado)");
+      } else if (usuario.rol === "profesor") {
+        alert("Excel solo de tu materia: " + materia);
+      } else {
+        alert("No tienes permiso para generar Excel");
+      }
+    }
+
+    function volver() {
+      if (usuario.rol === "profesor") window.location.href = "profesor.html";
+      else if (usuario.rol === "admin") window.location.href = "admin_panel.html";
+      else window.location.href = "alumno.html";
+    }
+
+    // Inicialización
+    cargarSelectorDias();
+
+    if (diasMateria.length > 0) {
+      selectorDia.value = normalizarDia(diasMateria[0]);
+    }
+
+    renderizarTabla();
+
+    selectorDia.addEventListener("change", renderizarTabla);
+    // Escuchar cambios en localStorage desde otras pestañas
+window.addEventListener("storage", function(event) {
+  if (event.key === "pases") {
+    // Recargar pase actualizado desde localStorage
+    console.log("Pase actualizado desde otra pestaña. Recargando...");
+    renderizarTabla();
+  }
+});
+
+  </script>
+</body>
+</html>

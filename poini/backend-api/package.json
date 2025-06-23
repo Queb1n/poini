@@ -1,0 +1,17 @@
+{
+  "name": "backend-api",
+  "version": "1.0.0",
+  "description": "API backend para sistema de asistencia",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "Kevin",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "mysql2": "^3.9.4"
+  }
+}

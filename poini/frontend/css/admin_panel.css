@@ -1,0 +1,160 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #F5F7FA;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 20px;
+}
+
+.login-container {
+  background-color: #FFFFFF;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  max-width: 1000px;
+  width: 100%;
+}
+
+h1, h2, h3 {
+  color: #2C3E50;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+form input,
+form select {
+  flex: 1 1 30%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #CCC;
+  font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+form input:focus,
+form select:focus {
+  border-color: #27AE60;
+  outline: none;
+}
+
+form button {
+  flex: 1 1 100%;
+  padding: 12px;
+  background-color: #27AE60;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+form button:hover {
+  background-color: #1E8449;
+}
+
+.btn-excel {
+  background-color: #2980b9;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-top: 10px;
+  transition: background-color 0.3s;
+}
+
+.btn-excel:hover {
+  background-color: #2471a3;
+}
+
+.opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.opciones a {
+  text-decoration: none;
+  color: #3498DB;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.opciones a:hover {
+  color: #2C3E50;
+}
+
+select#grupoSelect {
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #CCC;
+  width: 100%;
+  font-size: 14px;
+}
+
+a[href="login.html"] {
+  display: inline-block;
+  margin-top: 20px;
+  text-align: center;
+  width: 100%;
+  font-weight: bold;
+  color: #E74C3C;
+  text-decoration: none;
+}
+
+a[href="login.html"]:hover {
+  color: #C0392B;
+}
+
+/* 🎯 NUEVO: Estilo para el checklist de materias */
+#materiasCheckboxes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 0;
+}
+
+#materiasCheckboxes label {
+  flex: 1 1 30%;
+  background-color: #ecf0f1;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+#materiasCheckboxes label:hover {
+  background-color: #d0e9d2;
+  border-color: #27ae60;
+}
+
+#materiasCheckboxes input[type="checkbox"] {
+  accent-color: #27AE60;
+  transform: scale(1.2);
+}
