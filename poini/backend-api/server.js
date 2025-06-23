@@ -7,9 +7,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Ruta raíz para prueba rápida
+// Redirigir la raíz '/' a '/api/login'
 app.get('/', (req, res) => {
-  res.send('API funcionando correctamente. Usa las rutas /api/...');
+  res.redirect('/api/login');
 });
 
 // 🔐 Login
