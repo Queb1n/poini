@@ -8,12 +8,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Servir archivos estáticos de la carpeta 'public'
-app.use(express.static(path.join(__dirname, "public")));
+// Servir archivos estáticos desde la carpeta 'frontend'
+app.use(express.static(path.join(__dirname, "frontend")));
 
-// Al acceder a la raíz, enviar el archivo login.html
+// Ruta raíz que envía el archivo login.html
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "login.html"));
+  res.sendFile(path.join(__dirname, "frontend", "login.html"));
 });
 
 // 🔐 Login
