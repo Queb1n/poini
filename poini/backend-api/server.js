@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const db = require('./conexion');
 require("dotenv").config();
 
@@ -7,17 +8,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Redirigir la raíz '/' a '/api/login'
+// Servir archivos estáticos de la carpeta 'public'
+app.use(express.static(path.join(__dirname, "public")));
+
+// Al acceder a la raíz, enviar el archivo login.html
 app.get('/', (req, res) => {
-  res.redirect('/api/login');
+  res.sendFile(path.join(__dirname, "public", "login.html"));
 });
 
-// Ruta GET para /api/login (solo para probar en navegador)
-app.get('/api/login', (req, res) => {
-  res.send('Página de login (usa POST para autenticar)');
-});
-
-// 🔐 Login (POST)
+// 🔐 Login
 app.post("/api/login", (req, res) => {
   const { matricula, password, rol } = req.body;
 
