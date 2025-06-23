@@ -1,19 +1,21 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const db = require('./conexion');
+const db = require("./conexion");
 require("dotenv").config();
 
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 
-// 👉 Servir archivos estáticos desde la carpeta frontend
-app.use(express.static(path.join(__dirname, 'frontend')));
+// Servir archivos estáticos de la carpeta frontend (HTML, CSS, JS)
+app.use(express.static(path.join(__dirname, "frontend")));
 
 // 👉 Ruta raíz que muestra login.html
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend', 'login.html'));
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "frontend", "login.html"));
 });
 
 // 🔐 Login
@@ -42,8 +44,7 @@ app.post("/api/login", (req, res) => {
 
 // 📥 Obtener todos los usuarios
 app.get("/api/usuarios", (req, res) => {
-  const query = "SELECT * FROM usuarios";
-  db.query(query, (err, results) => {
+  db.query("SELECT * FROM usuarios", (err, results) => {
     if (err) {
       console.error("Error al obtener usuarios:", err);
       return res.status(500).json({ error: "Error interno" });
@@ -54,17 +55,7 @@ app.get("/api/usuarios", (req, res) => {
 
 // ➕ Registrar nuevo usuario
 app.post("/api/usuarios", (req, res) => {
-  const {
-    matricula,
-    password,
-    rol,
-    nombre,
-    ape1,
-    ape2,
-    correo,
-    grupo,
-    materias = []
-  } = req.body;
+  const { matricula, password, rol, nombre, ape1, ape2, correo, grupo, materias = [] } = req.body;
 
   const query = `INSERT INTO usuarios (matricula, password, rol, nombre, ape1, ape2, correo, grupo)
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -92,12 +83,11 @@ app.post("/api/usuarios", (req, res) => {
   });
 });
 
-// ❌ Eliminar usuario por matrícula
+// ❌ Eliminar usuario
 app.delete("/api/usuarios/:matricula", (req, res) => {
   const { matricula } = req.params;
 
-  const query = "DELETE FROM usuarios WHERE matricula = ?";
-  db.query(query, [matricula], (err, result) => {
+  db.query("DELETE FROM usuarios WHERE matricula = ?", [matricula], (err, result) => {
     if (err) {
       console.error("Error al eliminar usuario:", err);
       return res.status(500).json({ error: "Error al eliminar usuario" });
@@ -109,6 +99,13 @@ app.delete("/api/usuarios/:matricula", (req, res) => {
   });
 });
 
-// 🟢 Iniciar servidor
+// ✨ Ruta 404 para otras páginas no encontradas
+app.use((req, res) => {
+  res.status(404).send("Página no encontrada");
+});
+
+// 🚀 Iniciar servidor
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ API y frontend funcionando en http://localhost:${PORT}`));
+app.listen(PORT, () => {
+  console.log(`✅ API y frontend corriendo en http://localhost:${PORT}`);
+});
