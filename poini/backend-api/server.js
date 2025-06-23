@@ -10,12 +10,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Servir archivos estáticos de la carpeta frontend (HTML, CSS, JS)
-app.use(express.static(path.join(__dirname, "frontend")));
+// Servir archivos estáticos desde la carpeta frontend
+const frontendPath = path.join(__dirname, "frontend");
+app.use(express.static(frontendPath));
 
-// 👉 Ruta raíz que muestra login.html
+// Ruta raíz -> login.html
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "login.html"));
+  res.sendFile(path.join(frontendPath, "login.html"));
 });
 
 // 🔐 Login
@@ -28,12 +29,18 @@ app.post("/api/login", (req, res) => {
       console.error("Error en login:", err);
       return res.status(500).json({ error: "Error interno del servidor" });
     }
+
     if (results.length > 0) {
       const usuario = results[0];
       const queryMaterias = "SELECT clave_materia FROM usuarios_materias WHERE id_usuario = ?";
       db.query(queryMaterias, [usuario.id_usuario], (err2, materiasResult) => {
-        if (err2) return res.status(500).json({ error: "Error al obtener materias" });
-        usuario.materias = materiasResult.map(m => m.clave_materia);
+        if (err2) {
+          console.error("Error al obtener materias:", err2);
+          usuario.materias = []; // Evitar fallo, continuar sin materias
+        } else {
+          usuario.materias = materiasResult.map(m => m.clave_materia);
+        }
+
         res.json(usuario);
       });
     } else {
@@ -92,19 +99,21 @@ app.delete("/api/usuarios/:matricula", (req, res) => {
       console.error("Error al eliminar usuario:", err);
       return res.status(500).json({ error: "Error al eliminar usuario" });
     }
+
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "Usuario no encontrado" });
     }
+
     res.json({ mensaje: "Usuario eliminado correctamente" });
   });
 });
 
-// ✨ Ruta 404 para otras páginas no encontradas
+// ⚠️ Ruta 404
 app.use((req, res) => {
   res.status(404).send("Página no encontrada");
 });
 
-// 🚀 Iniciar servidor
+// 🚀 Servidor
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`✅ API y frontend corriendo en http://localhost:${PORT}`);
