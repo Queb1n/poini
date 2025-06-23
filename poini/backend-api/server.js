@@ -7,6 +7,11 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Ruta raíz para prueba rápida
+app.get('/', (req, res) => {
+  res.send('API funcionando correctamente. Usa las rutas /api/...');
+});
+
 // 🔐 Login
 app.post("/api/login", (req, res) => {
   const { matricula, password, rol } = req.body;
