@@ -33,7 +33,7 @@
         <option value="">Selecciona rol</option>
         <option value="alumno">Alumno</option>
         <option value="profesor">Profesor</option>
-        <option value="admin">Administrador</option> <!-- Agregado admin -->
+        <option value="admin">Administrador</option>
       </select>
       <input type="text" placeholder="Nombre" name="nombre" required />
       <input type="text" placeholder="Apellido Paterno" name="ape1" />
@@ -56,7 +56,7 @@
   </div>
 
   <script>
-    // Validar sesión y mostrar nombre
+    // Validar sesión
     const usuario = JSON.parse(localStorage.getItem("usuario"));
     if (!usuario || usuario.rol !== "admin") {
       location.href = "login.html";
@@ -74,7 +74,6 @@
       alert("Excel general del sistema generado (simulado)");
     }
 
-    // Materias disponibles
     const materiasDisponibles = [
       "ACF-0905",
       "SCC-1017",
@@ -87,7 +86,6 @@
       "ACA-0907"
     ];
 
-    // Generar checkboxes materias
     const materiasContainer = document.getElementById("materiasCheckboxes");
     materiasDisponibles.forEach(materia => {
       const label = document.createElement("label");
@@ -99,25 +97,25 @@
       materiasContainer.appendChild(label);
     });
 
-    // Enviar formulario
     document.getElementById("formNuevoUsuario").addEventListener("submit", async function (e) {
       e.preventDefault();
       const form = new FormData(e.target);
-
-      // Convertir FormData a objeto
       const nuevoUsuario = Object.fromEntries(form.entries());
 
-      // Obtener materias seleccionadas como array
       const materiasSeleccionadas = Array.from(
         document.querySelectorAll('input[name="materias"]:checked')
       ).map(c => c.value);
 
-      nuevoUsuario.materias = materiasSeleccionadas;
+      nuevoUsuario.materias = JSON.stringify(materiasSeleccionadas); // importante para MySQL tipo JSON
 
-      // Ajustes según rol
+      if (!nuevoUsuario.rol) {
+        alert("⚠️ Debes seleccionar un rol.");
+        return;
+      }
+
       if (nuevoUsuario.rol !== "alumno") {
         nuevoUsuario.grupo = null;
-        nuevoUsuario.materias = [];
+        nuevoUsuario.materias = JSON.stringify([]);
       } else {
         if (!nuevoUsuario.grupo || nuevoUsuario.grupo.trim() === "") {
           nuevoUsuario.grupo = null;
@@ -125,7 +123,7 @@
       }
 
       try {
-        const res = await fetch("http://localhost:3000/api/usuarios", {
+        const res = await fetch("https://poini-production.up.railway.app/api/usuarios", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(nuevoUsuario)
